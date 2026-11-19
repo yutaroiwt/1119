@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
+    <link rel="icon" href="data:,">
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/projapayuri/aframe-vr-kit@v0.3.0/vr-kit.js"></script>
+    <style>
+        #hud {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 999;
+        }
+
+        select {
+            font-size: 18px;
+            padding: 4px 8px;
+            width: 200px;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div id="hud">
+        <select name="" id="avatarChoice">
+            <option value="robot.glb">ロボット</option>
+            <option value="wolf.glb">狼</option>
+        </select>
+        <p id="counttext">0 / 3</p>
+        <p id="count"></p>
+        <footar id="footer" >
+            
+            <p>house interiors by Gabriele Romagnoli [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/9UGOIbCy8C)</p>
+        </footar>
+
+    </div>
+    
+
+    <a-scene>
+        <a-sky color="lightblue"></a-sky>
+        <a-entity
+        gltf-model="12.glb"
+        id="map"
+        scale="100 100 100"
+        walkable
+        ></a-entity>
+
+        <a-entity id="avatar" gltf-model="robot.glb" position="0 0 -3" scale="0.3 0.3 0.3" avatar="
+            view:third;
+            avatarDirection:180;
+            walk: Robot_Walking;
+            idle: Robot_Wave;
+            cameraFollow:false;
+            moveSpeed: 1;
+            ">
+        </a-entity>
+
+        <a-entity
+        id="cabin"
+        gltf-model="cabin.glb"
+        position="-5 0.5 0"
+        scale="10 10 10"        
+        >
+            
+        </a-entity>
+
+        <a-box id="box1" color="gold" position="0 1 -5" solid></a-box>
+        
+        <a-box id="box2" color="gold" position="-5 1 -8" solid></a-box>
+        
+        <a-box id="box3" color="gold" position="5 1 -10" solid></a-box>
+    </a-scene>
+
+    <script>
+        const avatar = document.getElementById("avatar");
+        const avatarChoice = document.getElementById("avatarChoice");
+
+        function changeAvatar() {
+            if (avatarChoice.value === "wolf.glb") {
+                avatar.setAttribute("gltf-model", avatarChoice.value);
+                avatar.setAttribute("scale", "0.5 0.5 0.5");
+                avatar.setAttribute(
+                    "avatar-motion", {
+                    walk: "Gallop",
+                    idle: "Idle"
+                })
+            }
+
+            if (avatarChoice.value === "robot.glb") {
+                avatar.setAttribute("gltf-model", avatarChoice.value);
+                avatar.setAttribute("scale", "0.3 0.3 0.3");
+                avatar.setAttribute(
+                    "avatar-motion", {
+                    walk: "Robot_Walking",
+                    idle: "Robot_Wave"
+                })
+            }
+        }
+        avatarChoice.addEventListener("change", changeAvatar);
+
+        const box1 = document.getElementById("box1");
+        const box2 = document.getElementById("box2");
+        const box3 = document.getElementById("box3");
+        const count = document.getElementById("count");
+        const counttext = document.getElementById("counttext");
+        const clearSound = new Audio("clear.mp3");
+        const getBoxSound = new Audio("getBox.mp3");
+
+
+        let i = 0;
+        let c = 0;
+
+        let box1Aru = true;
+        let box2Aru = true;
+        let box3Aru = true;
+        
+        function checkBox(){
+            
+            
+            if (box1Aru === true && isNear(avatar, box1, 1.5)){
+                box1.setAttribute("visible",false);
+                 box1Aru = false;
+                 getBoxSound.play();
+                 i = i+1;
+                counttext.textContent = i + "/ 3"
+ 
+        }
+          if (box2Aru === true && isNear(avatar, box2, 1.5)){
+                box2.setAttribute("visible",false);
+                box2Aru = false
+                getBoxSound.play();
+                 i = i+1;
+                counttext.textContent = i + "/ 3"
+          }  if (box3Aru === true && isNear(avatar, box3, 1.5)){
+                getBoxSound.play();
+                box3.setAttribute("visible",false);
+                box3Aru = false;
+                 i = i+1;
+                counttext.textContent = i + "/ 3"
+          } if (i == 3 && c < 1){
+            c = c+1;
+            count.textContent = "クリア";
+            clearSound.play();
+            
+          }
+
+        }
+
+        setInterval(checkBox,100);
+        
+
+
+    </script>
+
+</body>
+
+
+</html>
